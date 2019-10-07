@@ -1,10 +1,16 @@
 use std::path::Path;
 
+use rand::Rng;
+use vrf::openssl::{CipherSuite, ECVRF};
+use vrf::VRF;
+
 pub struct Database {
     conn: sqlite::Connection,
+    vrf: ECVRF,
+    secret_key: Vec<u8>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Row {
     pub seed: String,
     pub input: String,
@@ -12,10 +18,13 @@ pub struct Row {
     pub proof: String,
 }
 
+const SEED_LEN: usize = 32;
+
 impl Database {
-    pub fn new<T: AsRef<Path>>(path: T) -> Self {
+    pub fn new<T: AsRef<Path>>(path: T, ciphersuite: CipherSuite, secret_key: Vec<u8>) -> Self {
         // TODO: error handling
         let conn = sqlite::open(path).unwrap();
+        let vrf = ECVRF::from_suite(ciphersuite).unwrap();
         let result = conn.execute(
             "
             CREATE TABLE outputs (seed TEXT, user_input TEXT, output TEXT, proof TEXT);
@@ -25,10 +34,14 @@ impl Database {
             Ok(_) => println!("Created the table"),
             Err(_) => println!("Already the table exists"),
         }
-        Self { conn }
+        Self {
+            conn,
+            vrf,
+            secret_key,
+        }
     }
 
-    pub fn insert(&self, row: Row) {
+    fn insert_inner(&self, row: Row) {
         // TODO: remove '' from input
         // TODO: check hexstring-ness and length of seed/output/proof
         // TODO: error handling
@@ -46,7 +59,28 @@ impl Database {
         statement.next().unwrap();
     }
 
-    pub fn get(&self, num: i64) -> Row {
+    pub fn insert(&mut self, user_input: String) {
+        let seed = self.get_seed();
+
+        let mut input = vec![];
+        input.extend(&seed);
+        input.extend(user_input.as_bytes());
+
+        let pi = self.vrf.prove(&self.secret_key, &input).unwrap();
+        let hash = self.vrf.proof_to_hash(&pi).unwrap();
+
+        let pi_str = hex::encode(pi);
+        let hash_str = hex::encode(hash);
+
+        self.insert_inner(Row {
+            seed: hex::encode(seed),
+            input: user_input,
+            output: hash_str,
+            proof: pi_str,
+        });
+    }
+
+    pub fn get_row(&self, num: i64) -> Row {
         // Statement setting
         let mut statement = self
             .conn
@@ -70,5 +104,20 @@ impl Database {
 
         statement.next().unwrap();
         statement.read::<i64>(0).unwrap()
+    }
+
+    fn get_seed(&self) -> Vec<u8> {
+        let size = self.size();
+        match size {
+            0 => {
+                let mut rng = rand::thread_rng();
+                (0..SEED_LEN).map(|_| rng.gen::<u8>()).collect()
+            }
+            v => hex::decode(self.get_row(v).seed).unwrap(),
+        }
+    }
+
+    pub fn pubkey(&mut self) -> Vec<u8> {
+        self.vrf.derive_public_key(&self.secret_key).unwrap()
     }
 }
