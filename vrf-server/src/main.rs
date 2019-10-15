@@ -16,6 +16,8 @@ use rocket::State;
 use rocket_contrib::json::{Json, JsonValue};
 use vrf::openssl::CipherSuite;
 
+const API_VERSION: &str = "0.1";
+
 #[derive(Serialize, Deserialize)]
 struct ReqMessage {
     input: String,
@@ -55,6 +57,11 @@ fn pubkey(db: State<'_, Mutex<Database>>) -> JsonValue {
     json!({ "pubkey": hex::encode(database.pubkey()) })
 }
 
+#[get("/version")]
+fn version(_db: State<'_, Mutex<Database>>) -> JsonValue {
+    json!({ "version": API_VERSION })
+}
+
 #[catch(404)]
 fn not_found() -> JsonValue {
     json!({
@@ -74,7 +81,7 @@ fn main() {
     ));
 
     rocket::ignite()
-        .mount("/", routes![req, get, size, pubkey])
+        .mount("/", routes![req, get, size, pubkey, version])
         .register(catchers![not_found])
         .manage(database)
         .launch();
