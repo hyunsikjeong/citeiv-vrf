@@ -38,9 +38,14 @@ fn req(message: Json<ReqMessage>, db: State<'_, Mutex<Database>>) -> Json<ReqRes
 }
 
 #[get("/get/<idx>")]
-fn get(idx: i64, db: State<'_, Mutex<Database>>) -> Json<Row> {
+fn get(idx: i64, db: State<'_, Mutex<Database>>) -> Option<Json<Row>> {
     let database = db.lock().expect("database lock.");
-    Json(database.get_row(idx))
+    if idx <= 0 || idx > database.size() {
+        None
+    }
+    else {
+        Some(Json(database.get_row(idx)))
+    }
 }
 
 #[get("/size")]
