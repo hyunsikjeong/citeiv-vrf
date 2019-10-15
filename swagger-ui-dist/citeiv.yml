@@ -1,0 +1,187 @@
+openapi: "3.0.2"
+
+info:
+  title: "vrf-server API"
+  description: "This is the documentation for vrf-server API."
+  version: "0.1"
+
+servers:
+- url: "http://rb-tree.xyz/citeivapi"
+
+tags:
+  - name: Basic Information
+    description: "Get the basic information of the server"
+  - name: Database
+    description: "Get the data of the server database"
+
+paths:
+  /pubkey:
+    get:
+      tags:
+      - Basic Information
+      summary: "Get the public key of the server"
+      description: "Get the public key of the server."
+      operationId: pubKey
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicKey'
+        500:
+          description: Public key cannot be accessed
+  /version:
+    get:
+      tags:
+      - Basic Information
+      summary: "Get the version of API"
+      description: "Get the current version of API"
+      operationId: version
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Version'
+  /size:
+    get:
+      tags:
+      - Database
+      summary: "Get the size of the database"
+      description: "Get the number of rows in the current database."
+      operationId: size
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Size'
+        500:
+          description: Database cannot be accessed
+  /req:
+    post:
+      tags:
+      - Database
+      summary: "Request a VRF value"
+      description: "Request a VRF value to the database. This will return the index of the VRF value which will be calculated."
+      operationId: req
+      parameters:
+        - $ref: '#/components/parameters/input'
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Index'
+        500:
+          description: Database cannot be accessed
+        503:
+          description: Database failed to calculate the value
+  /get/<index>:
+    get:
+      tags:
+      - Database
+      summary: "Get a row"
+      description: Get a row from the database by the given index. The row will contain four values described below.
+      operationId: get
+      parameters:
+        - $ref: '#/components/parameters/index'
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Row'
+        404:
+          description: Row does not exist
+        500:
+          description: Database cannot be accessed
+
+security:
+- app_id: []
+
+components:
+  parameters:
+    input:
+      name: input
+      in: query
+      description: "Input string"
+      schema:
+        type: string
+
+    index:
+      name: index
+      in: query
+      description: "The 1-base index of the VRF value. This must be not greater than the size of the database."
+      schema:
+        type: number
+
+  schemas:
+    PublicKey:
+      title: Public Key
+      type: object
+      properties:
+        pubkey:
+          type: Hexstring
+          description: The P256-curve public key, in 66-byte length hexstring.
+          example: "0360fed4ba255a9d31c961eb74c6356d68c049b8923b61fa6ce669622e60f29fb6"
+
+    Version:
+      title: Version
+      type: object
+      properties:
+        version:
+          type: String
+          description: The version of API.
+          example: "0.1"
+
+    Size:
+      title: Size
+      type: object
+      properties:
+        size:
+          type: number
+          description: The number of rows in the database.
+          example: 131
+
+    Index:
+      title: Index
+      type: object
+      properties:
+        index:
+          type: number
+          description: The 1-base index of the VRF value. This must be not greater than the size of the database.
+          example: 130
+
+    Row:
+      title: Row
+      type: object
+      properties:
+        seed:
+          type: Hexstring
+          description: The seed input, which is 64-byte length hexstring.
+          example: "87341b944a9e0c1f049d65345b8a2399be00303fc7867b3c354f11dbfab547e0"
+        input:
+          type: String
+          description: The input given by a request.
+          example: "UserInfo1|UserInfo2|WOW!"
+        output:
+          type: Hexstring
+          description: The VRF output, which is 64-byte length hexstring.
+          example: "72432f804a8dee0208fe47d9d800cc0da72bbe1dbd27374cf3f9cba31ce1a530"
+        proof:
+          type: Hexstring
+          description: The VRF proof, which is 162-byte length hexstring.
+          example: "02d3b2a536a2fc5a4e1b615adb8dd39ead6863e7ba5a8f4b5e2ad009b5641d52db91d2aa57de81d02c0c5bd6d94d926054b4a4864979939784d33f3911ce9626f2d8e6d624ac0666e20f7d5ee10b2708b3"
+
+  # securitySchemes:
+  #   app_id:
+  #     type: apiKey
+  #     description: API key to authorize requests. If you don't have an OpenWeatherMap API key, use `fd4698c940c6d1da602a70ac34f0b147`.
+  #     name: appid
+  #     in: query
