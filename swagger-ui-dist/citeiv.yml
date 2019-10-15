@@ -68,8 +68,13 @@ paths:
       summary: "Request a VRF value"
       description: "Request a VRF value to the database. This will return the index of the VRF value which will be calculated."
       operationId: req
-      parameters:
-        - $ref: '#/components/parameters/input'
+      requestBody:
+        description: Give a string in the input field.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Input'
       responses:
         200:
           description: Successful response
@@ -81,7 +86,7 @@ paths:
           description: Database cannot be accessed
         503:
           description: Database failed to calculate the value
-  /get/<index>:
+  /get/{index}:
     get:
       tags:
       - Database
@@ -107,21 +112,22 @@ security:
 
 components:
   parameters:
-    input:
-      name: input
-      in: query
-      description: "Input string"
-      schema:
-        type: string
-
     index:
       name: index
-      in: query
+      in: path
       description: "The 1-base index of the VRF value. This must be not greater than the size of the database."
       schema:
         type: number
 
   schemas:
+    Input:
+      title: Request Input
+      type: object
+      properties:
+        input:
+          type: String
+          example: "abcd"
+
     PublicKey:
       title: Public Key
       type: object
