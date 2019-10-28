@@ -113,7 +113,7 @@ impl Database {
                 let mut rng = rand::thread_rng();
                 (0..SEED_LEN).map(|_| rng.gen::<u8>()).collect()
             }
-            v => hex::decode(self.get_row(v).seed).unwrap(),
+            v => hex::decode(self.get_row(v).output).unwrap(),
         }
     }
 
