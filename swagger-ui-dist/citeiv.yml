@@ -58,7 +58,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Size'
+                $ref: '#/components/schemas/Index'
         500:
           description: Database cannot be accessed
   /req:
@@ -145,15 +145,6 @@ components:
           type: String
           description: The version of API.
           example: "0.1"
-
-    Size:
-      title: Size
-      type: object
-      properties:
-        size:
-          type: number
-          description: The number of rows in the database.
-          example: 131
 
     Index:
       title: Index
