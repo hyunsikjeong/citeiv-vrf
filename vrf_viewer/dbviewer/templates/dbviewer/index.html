@@ -1,0 +1,22 @@
+{% if latest_record_list %}
+    <table>
+        <tr>
+            <th>Link</th>
+            <th>Seed</th>
+            <th>Input</th>
+            <th>Output</th>
+            <th>Proof</th>
+        </tr>
+        {% for record in latest_record_list %}
+        <tr>
+            <th><a href="{% url 'dbviewer:detail' record.id %}">Go</a></th>
+            <th> {{ record.seed }}</th>
+            <th> {{ record.input }}</th>
+            <th> {{ record.output }}</th>
+            <th> {{ record.proof }}</th>
+          </tr> 
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No data!</p>
+{% endif %}
