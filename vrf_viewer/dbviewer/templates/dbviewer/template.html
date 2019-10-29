@@ -1,0 +1,22 @@
+{% load static %}
+
+<head>
+<title>VRF Viewer</title>
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="{% static 'dbviewer/style.css' %}">
+</head>
+
+<body>
+<div class="header">
+    <p>VRF Viewer</p>
+</div>
+<div class="content">
+{% block 'body' %}
+{% endblock %}
+</div>
+<div class="footer">
+
+</div>
+</body>

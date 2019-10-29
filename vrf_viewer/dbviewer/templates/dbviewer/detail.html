@@ -1,3 +1,8 @@
+{% extends 'dbviewer/template.html' %} 
+{% block 'body' %}
+<div>
+    <h1>VRF Data</h1>
+</div>
 <ul>
     <li>Index: {{ record.id }}</li>
     <li>Seed: {{ record.seed }}</li>
@@ -5,4 +10,4 @@
     <li>Output: {{ record.output }}</li>
     <li>Proof: {{ record.proof }}</li>
 </ul>
-
+{% endblock %}
