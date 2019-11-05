@@ -7,8 +7,20 @@ import requests
 
 def index(request):
     latest_record_list = Records.objects.order_by('-id')
-    context = {'latest_record_list': latest_record_list}
 
+    if latest_record_list is None:
+        return render(request, 'dbviewer/index.html', {'table_header': None})
+
+    table_header = Records.user_input_fields()
+    table_header.append("Output")
+
+    table_rows = []
+    for record in latest_record_list:
+        row = record.parse_user_input()
+        row.append(record.get_user_output())
+        table_rows.append({ 'id': record.id, 'idx': record.idx, 'values': row })
+
+    context = {'table_header': table_header, 'table_rows': table_rows}
     return render(request, 'dbviewer/index.html', context)
 
 def detail(request, record_id):
