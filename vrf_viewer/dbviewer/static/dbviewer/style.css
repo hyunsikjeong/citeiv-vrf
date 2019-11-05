@@ -50,6 +50,44 @@ body {
     text-overflow: ellipsis;
 }
 
+.info {
+    width: 80%;
+    margin: auto;
+}
+
+.info-table {
+    border-collapse: collapse;    
+    table-layout: fixed;
+    width: 100%;
+    margin: auto;
+}
+
+.info-table tbody tr {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+.info-col1 {
+    width: 10%;
+    font-weight: bold;
+}
+
+.info-col2 {
+    width: 90%;
+    font-weight: normal;
+}
+
+.info-table tbody th {
+    font-family: Roboto Mono, monospace;
+    overflow: hidden;
+    text-align: left;
+    text-overflow: ellipsis;
+}
+
+h2 {
+    text-align: left;
+}
+
 .text-center {
     text-align: center !important;
 }

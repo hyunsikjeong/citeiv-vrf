@@ -3,11 +3,32 @@
 <div>
     <h1>VRF Data</h1>
 </div>
-<ul>
-    <li>Index: {{ record.idx }}</li>
-    <li>Seed: {{ record.seed }}</li>
-    <li>Input: {{ record.input }}</li>
-    <li>Output: {{ record.output }}</li>
-    <li>Proof: {{ record.proof }}</li>
-</ul>
+<div class="info">
+    <h2>Main Information</h2>
+    <table class="info-table">
+        <tbody>
+            <tr>
+                <th class="info-col1">Index</th>
+                <th class="info-col2"> {{ record.idx }}</th>
+            </tr>
+            <tr>
+                <th class="info-col1">Seed</th>
+                <th class="info-col2"> {{ record.seed }}</th>
+            </tr>
+            <tr>
+                <th class="info-col1">Input</th>
+                <th class="info-col2"> {{ record.input }}</th>
+            </tr>
+            <tr>
+                <th class="info-col1">Output</th>
+                <th class="info-col2"> {{ record.output }}</th>
+            </tr>
+            <tr>
+                <th class="info-col1">Proof</th>
+                <th class="info-col2"> {{ record.proof }}</th>
+            </tr>
+        </tbody>
+    </table>
+    <h2>User Input Information</h2>
+</div>
 {% endblock %}
