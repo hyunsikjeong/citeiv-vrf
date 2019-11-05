@@ -25,7 +25,7 @@ SECRET_KEY = 'lau9e(6tk*guotpew0=_s&5djltdb^qnwcheuuf$o*l2j95q!!'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [ '127.0.0.1', 'rb-tree.xyz' ]
 
 
 # Application definition
