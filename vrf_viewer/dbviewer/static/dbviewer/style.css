@@ -98,11 +98,11 @@ body {
 
 .info-col2 {
     width: 90%;
+    font-family: Roboto Mono, monospace;
     font-weight: normal;
 }
 
 .info-table tbody th {
-    font-family: Roboto Mono, monospace;
     overflow: hidden;
     text-align: left;
     text-overflow: ellipsis;
