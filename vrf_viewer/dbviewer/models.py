@@ -9,7 +9,8 @@ class Records(models.Model):
     output = models.CharField(max_length=64)
     proof = models.CharField(max_length=162)
 
-    def user_input_fields(self):
+    @staticmethod
+    def user_input_fields():
         return ["NAME", "TYPE", "WOW"]
     
     def parse_user_input(self):
