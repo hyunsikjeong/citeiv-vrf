@@ -3,9 +3,26 @@ from django.shortcuts import get_object_or_404, render
 # Create your views here.
 from django.http import HttpResponse, Http404
 from .models import Records
-import requests
 
+def static(**kwargs):
+    def decorate(func):
+        for k in kwargs:
+            setattr(func, k, kwargs[k])
+        return func
+    return decorate
+
+@static(last_update=None)
 def index(request):
+    import time, threading
+    cur_time = time.time()
+    last_update = index.last_update
+    if last_update is None or cur_time - last_update > 10:
+        print("Last update: {}".format(last_update))
+        print("Current time: {}".format(cur_time))
+        t = threading.Thread(target=refresh, args=('wow',))
+        t.start()
+        index.last_update = cur_time
+
     latest_record_list = Records.objects.order_by('-id')
 
     if latest_record_list is None:
@@ -32,6 +49,7 @@ def detail(request, record_id):
     return render(request, 'dbviewer/detail.html', context)
 
 def refresh(request):
+    import requests
     try:
         r = requests.get('http://rb-tree.xyz/citeivapi/size')
         size_api = r.json()['index']
