@@ -8,11 +8,16 @@ import requests
 def index(request):
     latest_record_list = Records.objects.order_by('-id')
     context = {'latest_record_list': latest_record_list}
+
     return render(request, 'dbviewer/index.html', context)
 
 def detail(request, record_id):
     record = get_object_or_404(Records, pk=record_id)
-    return render(request, 'dbviewer/detail.html', {'record': record})
+    user_input_table = record.get_user_input_table()
+    user_output_table = record.get_user_output_table()
+    context = {'record': record, 'uinput': user_input_table, 'uoutput': user_output_table}
+
+    return render(request, 'dbviewer/detail.html', context)
 
 def refresh(request):
     try:

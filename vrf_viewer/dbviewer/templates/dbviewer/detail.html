@@ -29,6 +29,28 @@
             </tr>
         </tbody>
     </table>
-    <h2>User Input Information</h2>
+    <h2>User Information</h2>
+    <h3>User Input</h3>
+    <table class="info-table">
+        <tbody>
+            {% for column in uinput %}
+            <tr>
+                <th class="info-col1">{{ column.type }}</th>
+                <th class="info-col2">{{ column.value }}</th>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h3>User Output</h3>
+    <table class="info-table">
+        <tbody>
+            {% for column in uoutput %}
+            <tr>
+                <th class="info-col1">{{ column.type }}</th>
+                <th class="info-col2">{{ column.value }}</th>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}
