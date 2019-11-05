@@ -4,19 +4,23 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, Http404
 from .models import Records
 
+
 def static(**kwargs):
     def decorate(func):
         for k in kwargs:
             setattr(func, k, kwargs[k])
         return func
+
     return decorate
+
 
 @static(last_update=None, loading=False)
 def index(request):
     import time, threading
     cur_time = time.time()
     last_update = index.last_update
-    if not index.loading and (last_update is None or cur_time - last_update > 10):
+    if not index.loading and (last_update is None
+                              or cur_time - last_update > 10):
         print("Last update: {}".format(last_update))
         print("Current time: {}".format(cur_time))
 
@@ -37,18 +41,24 @@ def index(request):
     for record in latest_record_list:
         row = record.parse_user_input()
         row.append(record.get_user_output())
-        table_rows.append({ 'id': record.id, 'idx': record.idx, 'values': row })
+        table_rows.append({'id': record.id, 'idx': record.idx, 'values': row})
 
     context = {'table_header': table_header, 'table_rows': table_rows}
     return render(request, 'dbviewer/index.html', context)
+
 
 def detail(request, record_id):
     record = get_object_or_404(Records, pk=record_id)
     user_input_table = record.get_user_input_table()
     user_output_table = record.get_user_output_table()
-    context = {'record': record, 'uinput': user_input_table, 'uoutput': user_output_table}
+    context = {
+        'record': record,
+        'uinput': user_input_table,
+        'uoutput': user_output_table
+    }
 
     return render(request, 'dbviewer/detail.html', context)
+
 
 def refresh():
     import requests
@@ -58,10 +68,16 @@ def refresh():
         size_db = Records.objects.count()
 
         for i in range(size_db, size_api):
-            r = requests.get('http://rb-tree.xyz/citeivapi/get/{}'.format(i + 1))
+            r = requests.get(
+                'http://rb-tree.xyz/citeivapi/get/{}'.format(i + 1))
             data = r.json()
 
-            record = Records(idx=i+1, seed=data['seed'], input=data['input'], output=data['output'], proof=data['proof'])
+            record = Records(
+                idx=i + 1,
+                seed=data['seed'],
+                input=data['input'],
+                output=data['output'],
+                proof=data['proof'])
             record.save()
         print("Refresh successful: {} to {}".format(size_db, size_api))
     except Exception as e:

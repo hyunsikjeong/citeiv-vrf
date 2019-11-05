@@ -3,6 +3,7 @@ from django.db import models
 # Create your models here.
 import inspect
 
+
 class Records(models.Model):
     idx = models.BigIntegerField()
     seed = models.CharField(max_length=64)
@@ -13,7 +14,7 @@ class Records(models.Model):
     @staticmethod
     def user_input_fields():
         return ["NAME", "TYPE", "WOW"]
-    
+
     def parse_user_input(self):
         ln = len(self.user_input_fields())
         res = self.input.split('|', ln)
@@ -42,16 +43,19 @@ class Records(models.Model):
         for i in range(len(input_fields)):
             col = {'type': input_fields[i], 'value': user_input[i]}
             res.append(col)
-        
+
         if len(user_input) > len(input_fields):
             assert len(user_input) == len(input_fields) + 1
             res.append({'type': 'Extra Input', 'value': user_input[-1]})
 
         return res
 
-    def get_user_output_table(self):        
-        res = [
-            {'type': 'Output', 'value': self.get_user_output()},
-            {'type': 'Output Logic', 'value': self.get_user_output_logic()}
-        ]
+    def get_user_output_table(self):
+        res = [{
+            'type': 'Output',
+            'value': self.get_user_output()
+        }, {
+            'type': 'Output Logic',
+            'value': self.get_user_output_logic()
+        }]
         return res
