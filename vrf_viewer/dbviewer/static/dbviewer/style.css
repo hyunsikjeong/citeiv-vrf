@@ -16,6 +16,7 @@ body {
     height: 60px;
     z-index: 10000;
 }
+
 .header p {
     float: left;
     display: block;
@@ -25,6 +26,29 @@ body {
     padding: 15px 30px 15px 30px;
     height: 30px;
     font-weight: bold;
+}
+
+.header a {
+    float: left;
+    display: block;
+    color: #fff;
+    text-align: center;
+    padding: 15px 15px;
+    height: 30px;
+    text-decoration: none;
+    -moz-transition-property: color, background-color;
+    -moz-transition-duration: 0.2s;
+    -webkit-transition-property: color, background-color;
+    -webkit-transition-duration: 0.2s;
+    -o-transition-property: color, background-color;
+    -o-transition-duration: 0.2s;
+    transition-property: color, background-color;
+    transition-duration: 0.2s;
+}
+
+.header a:hover {
+    background: #6B6E70;
+    color:black;
 }
 
 .content {
