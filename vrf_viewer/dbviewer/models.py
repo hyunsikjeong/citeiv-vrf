@@ -16,6 +16,8 @@ class Records(models.Model):
     def parse_user_input(self):
         ln = len(self.user_input_fields())
         res = self.input.split('|', ln)
+        if len(res) < ln:
+            res += ["None"] * (ln - len(res))
         return res
 
     def get_user_output(self):
@@ -29,11 +31,7 @@ class Records(models.Model):
         user_input = self.parse_user_input()
 
         for i in range(len(input_fields)):
-            col = {'type': input_fields[i]}
-            if i < len(user_input):
-                col['value'] = user_input[i]
-            else:
-                col['value'] = 'None'
+            col = {'type': input_fields[i], 'value': user_input[i]}
             res.append(col)
         
         if len(user_input) > len(input_fields):
