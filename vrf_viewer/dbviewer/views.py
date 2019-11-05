@@ -24,7 +24,7 @@ def refresh(request):
             r = requests.get('http://rb-tree.xyz/citeivapi/get/{}'.format(i + 1))
             data = r.json()
 
-            record = Records(seed=data['seed'], input=data['input'], output=data['output'], proof=data['proof'])
+            record = Records(idx=i+1, seed=data['seed'], input=data['input'], output=data['output'], proof=data['proof'])
             record.save()
         return HttpResponse("Refresh successful: {} to {}".format(size_db, size_api))
     except Exception as e:
