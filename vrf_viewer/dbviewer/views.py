@@ -11,15 +11,17 @@ def static(**kwargs):
         return func
     return decorate
 
-@static(last_update=None)
+@static(last_update=None, loading=False)
 def index(request):
     import time, threading
     cur_time = time.time()
     last_update = index.last_update
-    if last_update is None or cur_time - last_update > 10:
+    if not index.loading and (last_update is None or cur_time - last_update > 10):
         print("Last update: {}".format(last_update))
         print("Current time: {}".format(cur_time))
-        t = threading.Thread(target=refresh, args=('wow',))
+
+        index.loading = True
+        t = threading.Thread(target=refresh, args=())
         t.start()
         index.last_update = cur_time
 
@@ -48,7 +50,7 @@ def detail(request, record_id):
 
     return render(request, 'dbviewer/detail.html', context)
 
-def refresh(request):
+def refresh():
     import requests
     try:
         r = requests.get('http://rb-tree.xyz/citeivapi/size')
@@ -61,6 +63,7 @@ def refresh(request):
 
             record = Records(idx=i+1, seed=data['seed'], input=data['input'], output=data['output'], proof=data['proof'])
             record.save()
-        return HttpResponse("Refresh successful: {} to {}".format(size_db, size_api))
+        print("Refresh successful: {} to {}".format(size_db, size_api))
     except Exception as e:
-        raise Http404("Failed to handle: {}".format(e))
+        print("Failed to handle: {}".format(e))
+    index.loading = False
