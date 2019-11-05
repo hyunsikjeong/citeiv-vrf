@@ -1,6 +1,7 @@
 from django.db import models
 
 # Create your models here.
+import inspect
 
 class Records(models.Model):
     idx = models.BigIntegerField()
@@ -25,6 +26,14 @@ class Records(models.Model):
         res = ['Gold', 'Silver', 'Bronze']
         return "{}({})".format(out, res[out])
 
+    def get_user_output_logic(self):
+        source = inspect.getsource(self.get_user_output)
+        output = ""
+        for line in source.split('\n'):
+            # Assuming one tab is 4 spaces
+            output += line[4:] + '\n'
+        return output[:-1]
+
     def get_user_input_table(self):
         res = []
         input_fields = self.user_input_fields()
@@ -41,4 +50,8 @@ class Records(models.Model):
         return res
 
     def get_user_output_table(self):        
-        return [{'type': 'Output', 'value': self.get_user_output()}]
+        res = [
+            {'type': 'Output', 'value': self.get_user_output()},
+            {'type': 'Output Logic', 'value': self.get_user_output_logic()}
+        ]
+        return res
