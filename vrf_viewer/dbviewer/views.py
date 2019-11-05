@@ -6,7 +6,7 @@ from .models import Records
 import requests
 
 def index(request):
-    latest_record_list = Records.objects.order_by('-id')[:5]
+    latest_record_list = Records.objects.order_by('-id')
     context = {'latest_record_list': latest_record_list}
     return render(request, 'dbviewer/index.html', context)
 

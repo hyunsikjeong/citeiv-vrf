@@ -7,7 +7,8 @@
 <table class="table">
     <thead>
         <tr>
-            <th style="width: 10%;">Link</th>
+            <th style="width: 5%;">Link</th>
+            <th style="width: 5%;">Number</th>
             <th style="width: 15%;">Seed</th>
             <th style="width: 20%;">Input</th>
             <th style="width: 40%;">Output</th>
@@ -18,6 +19,7 @@
         {% for record in latest_record_list %}
         <tr>
             <th class="text-center"><a href="{% url 'dbviewer:detail' record.id %}">Go</a></th>
+            <th class="text-center"> {{ record.id }}</th>
             <th> {{ record.seed }}</th>
             <th> {{ record.input }}</th>
             <th> {{ record.output }}</th>
