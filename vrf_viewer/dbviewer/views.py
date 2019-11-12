@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render
 
 # Create your views here.
 from django.http import HttpResponse, Http404
-from .models import VRFRecord
+from .models import VRFRecord, OutputInfo
 
 
 def static(**kwargs):
@@ -35,12 +35,22 @@ def index(request):
         return render(request, 'dbviewer/index.html', {'table_header': None})
 
     table_header = VRFRecord.user_input_fields()
-    table_header.append("Output")
+    table_header.append("Output Value")
+    table_header.append("Output Name")
 
     table_rows = []
     for record in latest_record_list:
         row = record.parse_user_input()
-        row.append(record.get_user_output())
+        user_output = record.get_user_output()
+
+        row.append(user_output)
+        
+        try:
+            output_info = OutputInfo.objects.get(pk=user_output)
+            row.append(output_info.name)
+        except OutputInfo.DoesNotExist:
+            row.append("None")
+        
         table_rows.append({'id': record.id, 'idx': record.idx, 'values': row})
 
     context = {'table_header': table_header, 'table_rows': table_rows}
@@ -51,6 +61,19 @@ def detail(request, record_id):
     record = get_object_or_404(VRFRecord, pk=record_id)
     user_input_table = record.get_user_input_table()
     user_output_table = record.get_user_output_table()
+
+    user_output = record.get_user_output()
+
+    output_info = get_object_or_404(OutputInfo, pk=user_output)
+    user_output_table.extend([{
+        'type': 'Output Name',
+        'value': output_info.name
+    }, {
+        'type': 'Output Image',
+        'image': output_info.image,
+    }])
+
+
     context = {
         'record': record,
         'uinput': user_input_table,

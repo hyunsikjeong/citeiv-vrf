@@ -23,9 +23,8 @@ class VRFRecord(models.Model):
         return res
 
     def get_user_output(self):
-        out = int(self.output, 16) % 3
-        res = ['Gold', 'Silver', 'Bronze']
-        return "{}({})".format(out, res[out])
+        out = int(self.output, 16) % 3 + 1
+        return out
 
     def get_user_output_logic(self):
         source = inspect.getsource(self.get_user_output)
@@ -59,3 +58,7 @@ class VRFRecord(models.Model):
             'value': self.get_user_output_logic()
         }]
         return res
+
+class OutputInfo(models.Model):
+    image = models.ImageField()
+    name = models.CharField(max_length=200)

@@ -47,7 +47,11 @@
             {% for column in uoutput %}
             <tr>
                 <th class="info-col1">{{ column.type }}</th>
+                {% if column.image %}
+                <th class="info-col2"><img src="{{ column.image.url }}"></th>
+                {% else %}
                 <th class="info-col2">{{ column.value }}</th>
+                {% endif %}
             </tr>
             {% endfor %}
         </tbody>
