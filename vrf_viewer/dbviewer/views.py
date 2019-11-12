@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render
 
 # Create your views here.
 from django.http import HttpResponse, Http404
-from .models import Records
+from .models import VRFRecord
 
 
 def static(**kwargs):
@@ -29,12 +29,12 @@ def index(request):
         t.start()
         index.last_update = cur_time
 
-    latest_record_list = Records.objects.order_by('-id')
+    latest_record_list = VRFRecord.objects.order_by('-id')
 
     if latest_record_list is None:
         return render(request, 'dbviewer/index.html', {'table_header': None})
 
-    table_header = Records.user_input_fields()
+    table_header = VRFRecord.user_input_fields()
     table_header.append("Output")
 
     table_rows = []
@@ -48,7 +48,7 @@ def index(request):
 
 
 def detail(request, record_id):
-    record = get_object_or_404(Records, pk=record_id)
+    record = get_object_or_404(VRFRecord, pk=record_id)
     user_input_table = record.get_user_input_table()
     user_output_table = record.get_user_output_table()
     context = {
@@ -65,14 +65,14 @@ def refresh():
     try:
         r = requests.get('http://rb-tree.xyz/citeivapi/size')
         size_api = r.json()['index']
-        size_db = Records.objects.count()
+        size_db = VRFRecord.objects.count()
 
         for i in range(size_db, size_api):
             r = requests.get(
                 'http://rb-tree.xyz/citeivapi/get/{}'.format(i + 1))
             data = r.json()
 
-            record = Records(
+            record = VRFRecord(
                 idx=i + 1,
                 seed=data['seed'],
                 input=data['input'],

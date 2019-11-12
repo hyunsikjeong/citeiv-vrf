@@ -4,7 +4,7 @@ from django.db import models
 import inspect
 
 
-class Records(models.Model):
+class VRFRecord(models.Model):
     idx = models.BigIntegerField()
     seed = models.CharField(max_length=64)
     input = models.CharField(max_length=200)
