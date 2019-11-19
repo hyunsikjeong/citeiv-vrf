@@ -13,7 +13,7 @@ class VRFRecord(models.Model):
 
     @staticmethod
     def user_input_fields():
-        return ["NAME", "TYPE"]
+        return ["USER NAME", "SLOT NUMBER"]
 
     def parse_user_input(self):
         ln = len(self.user_input_fields())
