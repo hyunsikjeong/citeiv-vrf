@@ -40,7 +40,7 @@ def index(request):
 
     table_rows = []
     for record in latest_record_list:
-        row = record.parse_user_input()
+        row = record.parse_user_input()[:-1]
         user_output = record.get_user_output()
 
         row.append(user_output)

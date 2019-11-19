@@ -13,17 +13,17 @@ class VRFRecord(models.Model):
 
     @staticmethod
     def user_input_fields():
-        return ["NAME", "TYPE", "WOW"]
+        return ["NAME", "TYPE"]
 
     def parse_user_input(self):
         ln = len(self.user_input_fields())
         res = self.input.split('|', ln)
-        if len(res) < ln:
-            res += ["None"] * (ln - len(res))
+        if len(res) < ln + 1:
+            res += ["None"] * (ln + 1 - len(res))
         return res
 
     def get_user_output(self):
-        out = int(self.output, 16) % 3 + 1
+        out = int(self.output, 16) % 6 + 1
         return out
 
     def get_user_output_logic(self):
@@ -62,3 +62,4 @@ class VRFRecord(models.Model):
 class OutputInfo(models.Model):
     image = models.ImageField()
     name = models.CharField(max_length=200)
+
