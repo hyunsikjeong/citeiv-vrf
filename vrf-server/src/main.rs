@@ -78,15 +78,19 @@ fn main() {
     // TODO: secret key storage
     let secret_key =
         hex::decode("c9afa9d845ba75166b5c215767b1d6934e50c3db36e89b127b8a622b120f6721").unwrap();
-    let database = Mutex::new(Database::new(
-        "./output.db",
-        CipherSuite::P256_SHA256_SWU,
-        secret_key,
-    ));
+    let database = Database::new("./output.db", CipherSuite::P256_SHA256_SWU, secret_key);
+
+    let db_mutex = match database {
+        Ok(v) => Mutex::new(v),
+        Err(e) => {
+            eprintln!("Database creation error: {}", e);
+            return;
+        }
+    };
 
     rocket::ignite()
         .mount("/", routes![req, get, size, pubkey, version])
         .register(catchers![not_found])
-        .manage(database)
+        .manage(db_mutex)
         .launch();
 }

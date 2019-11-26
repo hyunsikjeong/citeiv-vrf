@@ -1,7 +1,8 @@
+use std::fmt::{Display, Formatter, Result as FormatResult};
 use std::path::Path;
 
 use rand::Rng;
-use vrf::openssl::{CipherSuite, ECVRF};
+use vrf::openssl::{CipherSuite, Error as VRFError, ECVRF};
 use vrf::VRF;
 
 pub struct Database {
@@ -20,11 +21,42 @@ pub struct Row {
 
 const SEED_LEN: usize = 32;
 
+pub enum Error {
+    SqliteError(sqlite::Error),
+    VRFError(VRFError),
+}
+
+impl From<sqlite::Error> for Error {
+    fn from(error: sqlite::Error) -> Self {
+        Error::SqliteError(error)
+    }
+}
+
+impl From<VRFError> for Error {
+    fn from(error: VRFError) -> Self {
+        Error::VRFError(error)
+    }
+}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut Formatter) -> FormatResult {
+        match self {
+            Error::SqliteError(e) => write!(f, "Sqlite error: {}", e),
+            Error::VRFError(e) => write!(f, "ECVRF error: {}", e),
+        }
+    }
+}
+
 impl Database {
-    pub fn new<T: AsRef<Path>>(path: T, ciphersuite: CipherSuite, secret_key: Vec<u8>) -> Self {
-        // TODO: error handling
-        let conn = sqlite::open(path).unwrap();
-        let vrf = ECVRF::from_suite(ciphersuite).unwrap();
+    pub fn new<T: AsRef<Path>>(
+        path: T,
+        ciphersuite: CipherSuite,
+        secret_key: Vec<u8>,
+    ) -> Result<Self, Error> {
+        let conn = sqlite::open(path)?;
+        let vrf = ECVRF::from_suite(ciphersuite)?;
+
+        // If there's no table, create a table
         let result = conn.execute(
             "
             CREATE TABLE outputs (seed TEXT, user_input TEXT, output TEXT, proof TEXT);
@@ -34,11 +66,13 @@ impl Database {
             Ok(_) => println!("Created the table"),
             Err(_) => println!("Already the table exists"),
         }
-        Self {
+
+        // Return
+        Ok(Self {
             conn,
             vrf,
             secret_key,
-        }
+        })
     }
 
     fn insert_inner(&self, row: Row) {
