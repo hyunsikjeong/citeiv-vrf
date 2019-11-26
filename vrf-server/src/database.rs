@@ -26,6 +26,7 @@ pub enum Error {
     SqliteError(sqlite::Error),
     VRFError(VRFError),
     FromHexError(hex::FromHexError),
+    WrongRowError(String),
 }
 
 impl From<sqlite::Error> for Error {
@@ -52,6 +53,7 @@ impl Display for Error {
             Error::SqliteError(e) => write!(f, "Sqlite error: {}", e),
             Error::VRFError(e) => write!(f, "ECVRF error: {}", e),
             Error::FromHexError(e) => write!(f, "Hex error: {}", e),
+            Error::WrongRowError(e) => write!(f, "Wrong row error: {}", e),
         }
     }
 }
@@ -85,9 +87,23 @@ impl Database {
     }
 
     fn insert_inner(&self, row: Row) -> Result<(), Error> {
-        // TODO: error handling
-        if row.seed.len() != 64 || row.output.len() != 64 || row.proof.len() != 162 {
-            return Ok(());
+        if row.seed.len() != 64 {
+            return Err(Error::WrongRowError(format!(
+                "Expected length of seed is 64, but {}",
+                row.seed.len()
+            )));
+        }
+        if row.output.len() != 64 {
+            return Err(Error::WrongRowError(format!(
+                "Expected length of output is 64, but {}",
+                row.output.len()
+            )));
+        }
+        if row.proof.len() != 162 {
+            return Err(Error::WrongRowError(format!(
+                "Expected length of output is 162, but {}",
+                row.proof.len()
+            )));
         }
 
         let mut statement = self
