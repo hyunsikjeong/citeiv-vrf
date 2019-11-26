@@ -29,21 +29,24 @@ struct ReqResponse {
 }
 
 #[post("/req", format = "json", data = "<message>")]
-fn req(message: Json<ReqMessage>, db: State<'_, Mutex<Database>>) -> Json<ReqResponse> {
+fn req(message: Json<ReqMessage>, db: State<'_, Mutex<Database>>) -> Option<Json<ReqResponse>> {
     let mut database = db.lock().expect("database lock.");
-    database.insert(message.0.input);
-    Json(ReqResponse {
-        index: database.size(),
-    })
+    match database.insert(message.0.input) {
+        Ok(_) => Some(Json(ReqResponse {
+            index: database.size().unwrap(),
+        })),
+        Err(_) => None,
+    }
 }
 
 #[get("/get/<idx>")]
 fn get(idx: i64, db: State<'_, Mutex<Database>>) -> Option<Json<Row>> {
     let database = db.lock().expect("database lock.");
-    if idx <= 0 || idx > database.size() {
+    if idx <= 0 || idx > database.size().unwrap() {
         None
     } else {
-        Some(Json(database.get_row(idx)))
+        // Must succeed
+        Some(Json(database.get_row(idx).unwrap()))
     }
 }
 
@@ -51,14 +54,14 @@ fn get(idx: i64, db: State<'_, Mutex<Database>>) -> Option<Json<Row>> {
 fn size(db: State<'_, Mutex<Database>>) -> Json<ReqResponse> {
     let database = db.lock().expect("database lock.");
     Json(ReqResponse {
-        index: database.size(),
+        index: database.size().unwrap(),
     })
 }
 
 #[get("/pubkey")]
 fn pubkey(db: State<'_, Mutex<Database>>) -> JsonValue {
     let mut database = db.lock().expect("database lock.");
-    json!({ "pubkey": hex::encode(database.pubkey()) })
+    json!({ "pubkey": hex::encode(database.pubkey().unwrap()) })
 }
 
 #[get("/version")]

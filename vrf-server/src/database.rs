@@ -21,9 +21,11 @@ pub struct Row {
 
 const SEED_LEN: usize = 32;
 
+#[derive(Debug)]
 pub enum Error {
     SqliteError(sqlite::Error),
     VRFError(VRFError),
+    FromHexError(hex::FromHexError),
 }
 
 impl From<sqlite::Error> for Error {
@@ -38,11 +40,18 @@ impl From<VRFError> for Error {
     }
 }
 
+impl From<hex::FromHexError> for Error {
+    fn from(error: hex::FromHexError) -> Self {
+        Error::FromHexError(error)
+    }
+}
+
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter) -> FormatResult {
         match self {
             Error::SqliteError(e) => write!(f, "Sqlite error: {}", e),
             Error::VRFError(e) => write!(f, "ECVRF error: {}", e),
+            Error::FromHexError(e) => write!(f, "Hex error: {}", e),
         }
     }
 }
@@ -75,34 +84,34 @@ impl Database {
         })
     }
 
-    fn insert_inner(&self, row: Row) {
+    fn insert_inner(&self, row: Row) -> Result<(), Error> {
         // TODO: error handling
         if row.seed.len() != 64 || row.output.len() != 64 || row.proof.len() != 162 {
-            return;
+            return Ok(());
         }
 
         let mut statement = self
             .conn
-            .prepare("INSERT INTO outputs VALUES(?, ?, ?, ?)")
-            .unwrap();
+            .prepare("INSERT INTO outputs VALUES(?, ?, ?, ?)")?;
 
-        statement.bind(1, &*row.seed).unwrap();
-        statement.bind(2, &*row.input).unwrap();
-        statement.bind(3, &*row.output).unwrap();
-        statement.bind(4, &*row.proof).unwrap();
+        statement.bind(1, &*row.seed)?;
+        statement.bind(2, &*row.input)?;
+        statement.bind(3, &*row.output)?;
+        statement.bind(4, &*row.proof)?;
 
-        statement.next().unwrap();
+        statement.next()?;
+        Ok(())
     }
 
-    pub fn insert(&mut self, user_input: String) {
-        let seed = self.get_seed();
+    pub fn insert(&mut self, user_input: String) -> Result<(), Error> {
+        let seed = self.get_seed()?;
 
         let mut input = vec![];
         input.extend(&seed);
         input.extend(user_input.as_bytes());
 
-        let pi = self.vrf.prove(&self.secret_key, &input).unwrap();
-        let hash = self.vrf.proof_to_hash(&pi).unwrap();
+        let pi = self.vrf.prove(&self.secret_key, &input)?;
+        let hash = self.vrf.proof_to_hash(&pi)?;
 
         let pi_str = hex::encode(pi);
         let hash_str = hex::encode(hash);
@@ -112,46 +121,43 @@ impl Database {
             input: user_input,
             output: hash_str,
             proof: pi_str,
-        });
+        })
     }
 
-    pub fn get_row(&self, num: i64) -> Row {
+    pub fn get_row(&self, num: i64) -> Result<Row, Error> {
         // Statement setting
-        let mut statement = self
-            .conn
-            .prepare("SELECT * FROM outputs WHERE rowid = ?")
-            .unwrap();
-        statement.bind(1, num).unwrap();
+        let mut statement = self.conn.prepare("SELECT * FROM outputs WHERE rowid = ?")?;
+        statement.bind(1, num)?;
 
         // Read
-        statement.next().unwrap();
-        Row {
-            seed: statement.read::<String>(0).unwrap(),
-            input: statement.read::<String>(1).unwrap(),
-            output: statement.read::<String>(2).unwrap(),
-            proof: statement.read::<String>(3).unwrap(),
-        }
+        statement.next()?;
+        Ok(Row {
+            seed: statement.read::<String>(0)?,
+            input: statement.read::<String>(1)?,
+            output: statement.read::<String>(2)?,
+            proof: statement.read::<String>(3)?,
+        })
     }
 
-    pub fn size(&self) -> i64 {
-        let mut statement = self.conn.prepare("SELECT COUNT(*) FROM outputs").unwrap();
+    pub fn size(&self) -> Result<i64, Error> {
+        let mut statement = self.conn.prepare("SELECT COUNT(*) FROM outputs")?;
 
-        statement.next().unwrap();
-        statement.read::<i64>(0).unwrap()
+        statement.next()?;
+        Ok(statement.read::<i64>(0)?)
     }
 
-    fn get_seed(&self) -> Vec<u8> {
-        let size = self.size();
+    fn get_seed(&self) -> Result<Vec<u8>, Error> {
+        let size = self.size()?;
         match size {
             0 => {
                 let mut rng = rand::thread_rng();
-                (0..SEED_LEN).map(|_| rng.gen::<u8>()).collect()
+                Ok((0..SEED_LEN).map(|_| rng.gen::<u8>()).collect())
             }
-            v => hex::decode(self.get_row(v).output).unwrap(),
+            v => Ok(hex::decode(self.get_row(v)?.output)?),
         }
     }
 
-    pub fn pubkey(&mut self) -> Vec<u8> {
-        self.vrf.derive_public_key(&self.secret_key).unwrap()
+    pub fn pubkey(&mut self) -> Result<Vec<u8>, Error> {
+        Ok(self.vrf.derive_public_key(&self.secret_key)?)
     }
 }
