@@ -43,8 +43,11 @@ impl Database {
 
     fn insert_inner(&self, row: Row) {
         // TODO: remove '' from input
-        // TODO: check hexstring-ness and length of seed/output/proof
         // TODO: error handling
+
+        if row.seed.len() != 64 || row.output.len() != 64 || row.proof.len() != 162 {
+            return;
+        }
 
         let mut statement = self
             .conn
