@@ -42,8 +42,7 @@ fn get(idx: i64, db: State<'_, Mutex<Database>>) -> Option<Json<Row>> {
     let database = db.lock().expect("database lock.");
     if idx <= 0 || idx > database.size() {
         None
-    }
-    else {
+    } else {
         Some(Json(database.get_row(idx)))
     }
 }
