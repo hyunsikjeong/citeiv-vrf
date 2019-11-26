@@ -28,7 +28,6 @@
     <div id="casino" style="padding-top:50px;">
       <div class="content">
         <h1>Slot Machine Example</h1>
-
         <div>
           <div id="casino1" class="slotMachine" style="margin-left: -65px;">
             <div class="slot slot1"></div>
@@ -57,6 +56,10 @@
             <div class="slot slot6"></div>
           </div>
 
+          <div class="input-group">
+            <h2> Your name </h2>
+            <input type="text" id="username" value="test">
+          </div>
           <div class="btn-group btn-group-justified" role="group">
             <button id="casinoShuffle" type="button" class="btn btn-primary btn-lg">Shuffle!</button>
             <button id="casinoStop" type="button" class="btn btn-primary btn-lg">Stop!</button>
@@ -135,11 +138,22 @@ const mCasino3 = new SlotMachine(casino3, {
 btnShuffle.addEventListener('click', () => {
   var i;
   indices = [];
+
+  var username = document.getElementById("username").value;
+  if (!username.match(/^[0-9a-z]+$/)) {
+    alert("Wrong username! (Only alphabet and number can be used)");
+    return;
+  }
+  if (username.length == 0) {
+    alert("Username cannot be empty")
+    return;
+  }
+
   for (i = 0; i < 3; i++) {
     var request = new XMLHttpRequest();
     request.open('POST', 'http://rb-tree.xyz/citeivapi/req', false);
     request.setRequestHeader("Content-Type", "application/json");
-    request.send("{\"input\":\"test|" + (i+1).toString() + "\"}");
+    request.send("{\"input\":\"" + username + "|" + (i+1).toString() + "\"}");
 
     if (request.status === 200) {
       var data = JSON.parse(request.responseText);

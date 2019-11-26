@@ -34,6 +34,11 @@ h1 {
   padding-bottom: 25px;
 }
 
+h2 {
+  text-align: center;
+  margin: auto;
+}
+
 .container {
   padding-top: 50px;
   padding-bottom: 50px;
@@ -107,165 +112,6 @@ header a {
 }
 
 /*
- * Airlines
- */
-#plane {
-  width: 100%;
-  position: relative;
-  border-bottom: 10px solid #B8312F;
-  border-top: 20px dashed #66D4FF;
-  background-color: rgb(0, 175, 225);
-  background-image: url('../img/plane.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: bottom left;
-}
-
-#plane .content {
-  width: 100%;
-  float: left;
-  font-size: 50px;
-  font-weight: 300;
-  line-height: 42px;
-  margin-top: 30px;
-  text-align: center;
-}
-
-#plane .content, footer .content{
-  font-family: 'Pathway Gothic One';
-  font-size: 70px;
-  font-weight: 300;
-  line-height: 80px;
-}
-
-.badge {
-  color: white;
-  vertical-align: middle;
-  font-size: 30px;
-  background-color: rgb(0, 175, 225);
-}
-
-#planeMachine {
-  height: 67px;
-  overflow: hidden;
-  display: inline-block;
-  text-align: left;
-}
-
-/*
- * SlotMachine
- */
-#randomize {
-  border-bottom: 10px solid rgb(72, 158, 48);
-  background-color: #EB6B56;
-  border-top: 20px dashed #B8312F;
-}
-
-#randomize .row > div.col-sm-4 > div {
-  padding: 40px;
-  width: 180px;
-  height: 180px;
-  background: white;
-  border-radius: 50%;
-  margin-left: auto;
-  margin-right: auto;
-  display: block;
-  text-align: center;
-}
-
-#randomize .row > div.col-xs-4 > div {
-  padding-top: 40px;
-  padding-left: 40px;
-  width: 175px;
-  height: 175px;
-  background-color: #fff;
-  border-radius: 50%;
-  margin: auto;
-}
-
-.randomizeMachine {
-  width: 100px;
-  height: 100px;
-}
-
-#randomize .btn-group {
-  margin-top: 30px;
-  width: auto;
-  margin-bottom: 15px;
-}
-
-.machineResult {
-  color: #fff;
-  text-align: center;
-  font-weight: 900;
-  height: 50px !important;
-  background: transparent !important;
-  font-size: 18px;
-  padding: 10px !important;
-}
-
-/*
- * Watch
- */
-#watch {
-  border-top: 20px dashed rgb(72, 158, 48);
-  border-bottom: 10px solid #195AC8;
-  background-color: #46D265;
-}
-
-#watch h1 {
-  margin: 0px;
-}
-
-#watch .small {
-  text-align: center;
-  background: url('../img/watch.png') no-repeat 50% 50%;
-  height: 300px;
-}
-
-#watch1 {
-  margin-left: calc(50% - 42px);
-  transform: translateY(115px);
-  width: 80px;
-  height: 80px;
-}
-
-#watch1 .slotMachineContainer > div {
-  color: #fff;
-  height: 80px;
-  width: 80px;
-  font-size: 64px;
-}
-
-#watch .btn-group .btn {
-  border: none;
-  background-color: rgb(72, 158, 48);
-}
-
-#watch .btn-group .btn:hover, .btn-group .btn:focus {
-  background-color: rgb(72, 158, 48);
-}
-
-/*
- * Triky
- */
- #triky {
-   background: url(../img/triky.jpg) no-repeat right 130px;
-   background-color: #0F99CA;
-   border-bottom: 10px solid rgb(180, 75, 119);
-   border-top: 20px dashed #195AC8;
-   background-position-x: calc(100% + 40px)
- }
-
-#triky1 {
-  background-color: #fff;
-  width: 155px;
-  height: 155px;
-  border-radius: 50%;
-  padding-top: 4px;
-}
-
-/*
  * Casino
  */
 #casino {
@@ -300,8 +146,17 @@ header a {
   display: inline-block;
 }
 
-#casino .btn-group {
+#casino .input-group {
   margin-top: 150px;
+  transform: translateX(-25px);
+}
+
+#casino .input-group input {
+  margin: auto;
+}
+
+#casino .btn-group {
+  margin-top: 20px;
   transform: translateX(-25px);
 }
 
