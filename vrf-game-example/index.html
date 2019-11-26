@@ -139,7 +139,7 @@ btnShuffle.addEventListener('click', () => {
     var request = new XMLHttpRequest();
     request.open('POST', 'http://rb-tree.xyz/citeivapi/req', false);
     request.setRequestHeader("Content-Type", "application/json");
-    request.send("{\"input\":\"test\"}");
+    request.send("{\"input\":\"test|" + (i+1).toString() + "\"}");
 
     if (request.status === 200) {
       var data = JSON.parse(request.responseText);
