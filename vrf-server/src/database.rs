@@ -42,9 +42,7 @@ impl Database {
     }
 
     fn insert_inner(&self, row: Row) {
-        // TODO: remove '' from input
         // TODO: error handling
-
         if row.seed.len() != 64 || row.output.len() != 64 || row.proof.len() != 162 {
             return;
         }
@@ -99,7 +97,6 @@ impl Database {
             output: statement.read::<String>(2).unwrap(),
             proof: statement.read::<String>(3).unwrap(),
         }
-        // TODO: There must be one row
     }
 
     pub fn size(&self) -> i64 {
